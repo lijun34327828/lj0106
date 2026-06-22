@@ -1,0 +1,19 @@
+{
+  "name": "behavior-detection-rule-engine",
+  "version": "1.0.0",
+  "description": "画面行为检测规则推演服务 - AI自动生成适配场景的识别参数组合",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "start:frontend": "node frontend/server.js",
+    "start:all": "concurrently \"npm run start\" \"npm run start:frontend\""
+  },
+  "keywords": ["behavior-detection", "rule-engine", "ai"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "concurrently": "^8.2.2"
+  }
+}

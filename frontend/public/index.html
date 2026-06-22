@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>行为检测规则推演配置平台</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <h1>🎯 行为检测规则推演配置平台</h1>
+      <div class="header-actions">
+        <span id="connectionStatus" class="status-indicator status-disconnected">后端连接中...</span>
+        <button id="resetBtn" class="btn btn-secondary">重置配置</button>
+        <button id="saveBtn" class="btn btn-primary">保存配置</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="workspace">
+      <section class="canvas-section">
+        <div class="section-title">
+          <h2>📍 检测区域划定</h2>
+          <div class="canvas-actions">
+            <select id="sceneType" class="select">
+              <option value="custom">选择场景类型...</option>
+            </select>
+            <button id="undoPointBtn" class="btn btn-sm btn-secondary">撤销上一点</button>
+            <button id="clearRegionBtn" class="btn btn-sm btn-danger">清空区域</button>
+          </div>
+        </div>
+        
+        <div class="canvas-wrapper">
+          <canvas id="regionCanvas" width="960" height="540"></canvas>
+          <div id="canvasHint" class="canvas-hint">
+            💡 点击画布添加顶点，绘制检测区域多边形（至少3个点），双击或点击"完成绘制"闭合区域
+          </div>
+          <div id="regionInfo" class="region-info"></div>
+        </div>
+
+        <div class="env-config">
+          <div class="env-item">
+            <label>摄像头角度</label>
+            <select id="cameraAngle" class="select">
+              <option value="normal">平视（标准）</option>
+              <option value="topdown">俯视（顶装）</option>
+              <option value="lowangle">仰角（低位）</option>
+            </select>
+          </div>
+          <div class="env-item">
+            <label>光照条件</label>
+            <select id="lighting" class="select">
+              <option value="normal">正常光照</option>
+              <option value="low">低光照/夜间</option>
+              <option value="high">强光/逆光</option>
+            </select>
+          </div>
+          <div class="env-item env-full">
+            <label>快速模板</label>
+            <select id="presetTemplate" class="select">
+              <option value="">选择预设场景模板...</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="detection-types-section">
+          <h2>🔍 异常类型选择</h2>
+          <div id="detectionTypesList" class="detection-types"></div>
+        </section>
+
+        <section class="actions-section">
+          <button id="generateBtn" class="btn btn-large btn-primary" disabled>
+            🤖 AI 推演识别参数
+          </button>
+          <div id="progressBar" class="progress-bar" style="display:none;">
+            <div class="progress-fill"></div>
+          </div>
+        </section>
+
+        <section id="parametersSection" class="parameters-section" style="display:none;">
+          <div class="section-header">
+            <h2>⚙️ 推演参数配置</h2>
+            <div class="section-actions">
+              <button id="syncBtn" class="btn btn-sm btn-secondary">🔄 同步更新</button>
+              <button id="validateBtn" class="btn btn-sm btn-success">✓ 校验配置</button>
+            </div>
+          </div>
+          <div id="summaryInfo" class="summary-info"></div>
+          <div id="parametersContent"></div>
+        </section>
+
+        <section id="validateSection" class="validate-section" style="display:none;">
+          <h2>✅ 校验结果</h2>
+          <div id="validateContent"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <div id="saveModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>保存配置</h3>
+      <div class="form-group">
+        <label>配置名称</label>
+        <input type="text" id="configName" class="input" placeholder="输入配置名称...">
+      </div>
+      <div class="form-group">
+        <label>描述（可选）</label>
+        <textarea id="configDesc" class="textarea" rows="3" placeholder="添加配置描述..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeSaveModal()">取消</button>
+        <button class="btn btn-primary" onclick="confirmSave()">确认保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/canvas.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
