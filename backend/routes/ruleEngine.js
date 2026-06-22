@@ -99,17 +99,29 @@ router.post('/validate', (req, res) => {
 
     for (const [typeKey, typeConfig] of Object.entries(config.detectionRules)) {
       for (const [paramKey, param] of Object.entries(typeConfig.parameters)) {
-        if (param.min !== undefined && param.value < param.min) {
-          issues.push({ type: typeKey, param: paramKey, message: `${param.label} 值 ${param.value} 低于最小值 ${param.min}` });
+        const isEnum = Array.isArray(param.options);
+
+        if (!isEnum) {
+          if (param.min !== undefined && param.value < param.min) {
+            issues.push({ type: typeKey, param: paramKey, message: `${param.label} 值 ${param.value} 低于最小值 ${param.min}` });
+          }
+          if (param.max !== undefined && param.value > param.max) {
+            issues.push({ type: typeKey, param: paramKey, message: `${param.label} 值 ${param.value} 高于最大值 ${param.max}` });
+          }
         }
-        if (param.max !== undefined && param.value > param.max) {
-          issues.push({ type: typeKey, param: paramKey, message: `${param.label} 值 ${param.value} 高于最大值 ${param.max}` });
+
+        if (isEnum) {
+          if (!param.options.includes(param.value)) {
+            issues.push({ type: typeKey, param: paramKey, message: `${param.label} 值 ${param.value} 不在可选项 [${param.options.join(', ')}] 中` });
+          }
+        } else {
+          if (param.recommendedRange && !engine.isInRange(param.value, param.recommendedRange, param)) {
+            const riskNote = param.falsePositiveRisk === 'high' ? '（误报高风险参数）' : '';
+            warnings.push({ type: typeKey, param: paramKey, message: `${param.label} ${param.value} 超出推荐范围 [${param.recommendedRange.join('-')}]${riskNote}` });
+          }
         }
-        if (param.recommendedRange && !engine.isInRange(param.value, param.recommendedRange)) {
-          const riskNote = param.falsePositiveRisk === 'high' ? '（误报高风险参数）' : '';
-          warnings.push({ type: typeKey, param: paramKey, message: `${param.label} ${param.value} 超出推荐范围 [${param.recommendedRange.join('-')}]${riskNote}` });
-        }
-        if (param.filteredRanges) {
+
+        if (!isEnum && param.filteredRanges) {
           for (const [min, max] of param.filteredRanges) {
             if (param.value >= min && param.value <= max) {
               issues.push({ type: typeKey, param: paramKey, message: `${param.label} 值 ${param.value} 落在误报敏感区间 [${min}-${max}]，已自动过滤` });

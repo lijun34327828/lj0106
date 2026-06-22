@@ -388,8 +388,10 @@ class RuleInferenceEngine {
           paramValue.value = this.filterSensitiveRange(paramValue);
         }
 
-        if (paramValue.recommendedRange) {
-          paramValue._inRecommendedRange = this.isInRange(paramValue.value, paramValue.recommendedRange);
+        if (paramValue.options) {
+          paramValue._inRecommendedRange = paramValue.options.includes(paramValue.value);
+        } else if (paramValue.recommendedRange) {
+          paramValue._inRecommendedRange = this.isInRange(paramValue.value, paramValue.recommendedRange, paramValue);
         }
       }
 
@@ -538,8 +540,12 @@ class RuleInferenceEngine {
     return Math.max(param.min, Math.min(param.max, value));
   }
 
-  isInRange(value, range) {
-    if (!range || range.length !== 2) return true;
+  isInRange(value, range, param) {
+    if (!range) return true;
+    if (param && param.options) {
+      return range.includes(value);
+    }
+    if (range.length !== 2) return true;
     return value >= range[0] && value <= range[1];
   }
 
